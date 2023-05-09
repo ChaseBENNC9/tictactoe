@@ -45,15 +45,19 @@ public class GameController : MonoBehaviour
 
 
 
-                int k = 0;
-        for(int i = 0; i < 3;i++)
+       //int k = 0;
+        for(int k = 1;k<10;k++)
         {
-            for (int j = 0; j < 3;j++)
+            for(int i = 0; i < 3;i++)
             {
-                k++;
-                board[i,j] = tiles[k-1];
+                for (int j = 0; j < 3;j++)
+                {
+                    //k++;
+                    board[i,j] = tiles[k-1];
+                }
             }
         }
+        
     }
 
     // Update is called once per frame
