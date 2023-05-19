@@ -41,23 +41,17 @@ public class GameController : MonoBehaviour
         cpuTurn = false;
         gameOver = false;
         board = new GameObject[3,3];
-       
 
-
-
-       //int k = 0;
-        for(int k = 1;k<10;k++)
+        int k = 0;
+    
+        for(int i = 0; i < 3;i++)
         {
-            for(int i = 0; i < 3;i++)
+            for (int j = 0; j < 3;j++)
             {
-                for (int j = 0; j < 3;j++)
-                {
-                    //k++;
-                    board[i,j] = tiles[k-1];
-                }
+                k++;
+                board[i,j] = tiles[k-1];
             }
-        }
-        
+        } 
     }
 
     // Update is called once per frame
@@ -83,7 +77,7 @@ public class GameController : MonoBehaviour
                 turnIndication.text = "Cpu win";
                 GameOver();
             }
-             if (CheckForWin("cross"))
+            else if (CheckForWin("cross"))
             {
                 turnIndication.text = "You win!";
                 GameOver();
@@ -128,7 +122,7 @@ public class GameController : MonoBehaviour
         isCoroutineExecuting = false; 
     }
     
-    public bool CheckForWin(string space)
+    public bool CheckForWin(string space) //Method that tests every possible scenario for a win. Cols, Rows and Angle. Returns a boolean.
     {
     if (board[0, 0].GetComponent<TileManager>().space == space && board[0, 1].GetComponent<TileManager>().space == space && board[0, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
     if (board[1, 0].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[1, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
@@ -144,13 +138,13 @@ public class GameController : MonoBehaviour
     return false;
     }
 
-    public bool CheckForDraw()
+    public bool CheckForDraw() //Method that returns true if none of the tiles are available
     {
         bool noSpaces = false;
-        foreach(GameObject tile in tiles)
+        foreach(GameObject tile in tiles) 
         {
-             noSpaces = !tile.GetComponent<TileManager>().spaceAvailable;
-             if(!noSpaces)
+             noSpaces = !tile.GetComponent<TileManager>().spaceAvailable; //noSpaces is set to the oppisite of each tiles availability (if every tile is taken returns true)
+             if(!noSpaces) //as soon as an available tile is found it breaks out the loop and returns false
              {
                 break;
              }
@@ -165,7 +159,7 @@ public class GameController : MonoBehaviour
         cpuTurn = !cpuTurn;
     }
 
-    public void GameOver()
+    public void GameOver() //When the game is over every tile is marked as taken to prevent the game from going further
     {
         foreach(GameObject tile in tiles)
         {
