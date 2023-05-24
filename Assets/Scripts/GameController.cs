@@ -65,7 +65,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        for (int i = 0; i < boardStates.Length; i++)
+        for (int i = 0; i < boardStates.Length; i++) //Updates the board with the updated placements.
         {
             boardStates[i] = tiles[i].GetComponent<TileManager>().space;
 
@@ -83,7 +83,6 @@ public class GameController : MonoBehaviour
             if (aiTurn && !CheckForDraw())
             {
                 StartCoroutine(DoAiTurn());
-                //aiTurnA();
             }
 
             if (GetWinner() == TileState.X)
@@ -105,7 +104,7 @@ public class GameController : MonoBehaviour
     }
 
 
-    private IEnumerator DoAiTurn()
+    private IEnumerator DoAiTurn() //Ai Turn is done in a Coroutine so Placement doesn't happen immediately.
     {
         if (isCoroutineExecuting)
         {
