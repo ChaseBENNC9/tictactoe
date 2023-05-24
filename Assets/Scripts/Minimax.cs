@@ -13,6 +13,10 @@ public class Minimax : MonoBehaviour
     {
         instance = this;
     }
+    private void Start() 
+    {
+
+    }
 
 
     public List<T> Shuffle<T>(List<T> list)  
@@ -33,7 +37,7 @@ public class Minimax : MonoBehaviour
         board = currentBoard;
         aiPlayer = player;
         humanPlayer = (player == CellState.X) ? CellState.O : CellState.X;
-        MoveData bestMove = MiniMax(0,aiPlayer);
+        MoveData bestMove = MiniMax(0,aiPlayer,int.MinValue,int.MaxValue);
         return bestMove.index;
     }
     private List<int> GetAvailableMoves()
@@ -61,68 +65,115 @@ public class Minimax : MonoBehaviour
         return moves[bestMoveIndex];
     }
 
-    private MoveData MiniMax(int depth, CellState currentPlayer)
+private MoveData MiniMax(int depth, CellState currentPlayer,int alpha,int beta) //Minimax algorithm for tic tac toe;
+{
+    List<int> availableMoves = GetAvailableMoves();
+    //availableMoves = Shuffle(availableMoves); //SHuffle the list so 
+    if (IsGameOver() || depth == 5 || availableMoves.Count == 0)
     {
-        List<int> availableMoves = GetAvailableMoves();
-        availableMoves = Shuffle(availableMoves);
-        if (IsGameOver() || depth == 5 || availableMoves.Count == 0)
-        {
-            MoveData move = new MoveData();
-            move.score = EvaluateBoard();
-            return move;
-        }
-        List<MoveData> moves = new List<MoveData>();
-        foreach(int moveIndex in availableMoves)
-        {
-            MoveData move = new MoveData();
-            move.index = moveIndex;
-            board[moveIndex] = currentPlayer;
-
-            if(currentPlayer == aiPlayer) //max
-            {
-                MoveData result = MiniMax(depth + 1, humanPlayer);
-                move.score = result.score;
-            }
-            else
-            {
-                MoveData result = MiniMax(depth + 1, aiPlayer);
-                move.score = result.score;
-            }
-            board[moveIndex] = CellState.Empty;
-            moves.Add(move);
-
-        }
-
-            return GetBestMove(moves,currentPlayer);
+        MoveData move = new MoveData();
+        move.score = EvaluateBoard();
+        return move;
     }
 
-    private bool IsGameOver()
+    List<MoveData> moves = new List<MoveData>();
+
+    foreach (int moveIndex in availableMoves)
     {
-        return (GetWinner() != CellState.Empty) || (GetAvailableMoves().Count == 0);
-    }
-    private CellState GetWinner()
-    {
-        if(GameController.Instance.CheckForWin(CellState.X))
+        MoveData move = new MoveData();
+        move.index = moveIndex;
+
+        // Apply the current player's move to the board
+        board[moveIndex] = currentPlayer;
+
+        if (currentPlayer == aiPlayer)
         {
-            return CellState.X;
-        }
-        else if (GameController.Instance.CheckForWin(CellState.O))
-        {
-            return CellState.O;
+            MoveData result = MiniMax(depth + 1, humanPlayer,alpha,beta);
+            move.score = result.score;
+
+
+            if(move.score > alpha)
+            {
+                alpha = move.score;
+            }
         }
         else
         {
-            return CellState.Empty;
+            MoveData result = MiniMax(depth + 1, aiPlayer,alpha,beta);
+            move.score = result.score;
+
+
+            if(move.score < beta)
+            {
+                beta = move.score;
+            }
+        }
+
+        // Restore the board state by removing the move
+        board[moveIndex] = CellState.Empty;
+
+        moves.Add(move);
+        if(currentPlayer == aiPlayer && move.score >= beta) 
+        {
+            break;
+        }
+        else if(currentPlayer == humanPlayer && move.score <= alpha)
+        {
+            break;
+        }
+
+    }
+
+    return GetBestMove(moves, currentPlayer);
+}
+
+    private bool IsGameOver()
+    {
+        return (FindWinner() != CellState.Empty) || (GetAvailableMoves().Count == 0);
+    }
+    public CellState FindWinner()
+    {
+    
+    // Check rows
+    for (int row = 0; row < 3; row++)
+    {
+
+        if (board[row * 3] != CellState.Empty && board[row * 3] == board[row * 3 + 1] && board[row * 3] == board[row * 3 + 2])
+        {
+            return board[row * 3];
         }
     }
+
+    // Check columns
+    for (int col = 0; col < 3; col++)
+    {
+        if (board[col] != CellState.Empty && board[col] == board[col + 3] && board[col] == board[col + 6])
+        {
+            return board[col];
+        }
+    }
+
+    // Check diagonals
+    if (board[0] != CellState.Empty && board[0] == board[4] && board[0] == board[8])
+    {
+        return board[0];
+    }
+    if (board[2] != CellState.Empty && board[2] == board[4] && board[2] == board[6])
+    {
+        return board[2];
+    }
+
+    return CellState.Empty; // No winner
+}
     private int EvaluateBoard()
     {
-        CellState winner = GetWinner();
-        if (winner == aiPlayer)
+        CellState winner = FindWinner();
+        if (winner == CellState.O)
         {
+
             return 1;
         }
-        else if (winner == humanPlayer)
+        else if (winner == CellState.X)
         {
             return -1;
         }

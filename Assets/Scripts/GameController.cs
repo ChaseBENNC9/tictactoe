@@ -71,6 +71,7 @@ public class GameController : MonoBehaviour
         for(int i = 0; i< boardStates.Length; i++)
         {
             boardStates[i] = tiles[i].GetComponent<TileManager>().space;
+            
         }
         if(!gameOver)
         {
@@ -85,16 +86,17 @@ public class GameController : MonoBehaviour
             if(cpuTurn && !CheckForDraw())
             {
                 StartCoroutine(DoCpuTurn());
+                //CpuTurnA();
             }
-  
-            if( CheckForWin(CellState.O))
-            {
-                turnIndication.text = "Cpu win";
-                EndGame();
-            }
-            else if (CheckForWin(CellState.X))
+
+            if (GetWinner() == CellState.X)
             {
                 turnIndication.text = "You win!";
+                EndGame();
+            }
+            else if (GetWinner() == CellState.O)
+            {
+                turnIndication.text = "Cpu win";
                 EndGame();
             }
             else if( CheckForDraw())
@@ -105,6 +107,19 @@ public class GameController : MonoBehaviour
         }    
     }
 
+    private void CpuTurnA()
+    {
+         if(!gameOver)
+        {
+            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
+            int bestMoveIndex = minimax.CalculateBestMove(boardStates,CellState.O);
+            boardStates[bestMoveIndex] = CellState.O;
+            cpuTile = GameObject.Find((bestMoveIndex+1).ToString());
+            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
+            cpuTile.GetComponent<TileManager>().PlaceCpuTile(); 
+
+        }
+    }
     private IEnumerator DoCpuTurn()
     {
         if(isCoroutineExecuting)
@@ -114,44 +129,65 @@ public class GameController : MonoBehaviour
         isCoroutineExecuting = true;
         if(!gameOver)
         {
-            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Random the Cpu tile for play testing
-           do
-           {
-            int r = UnityEngine.Random.Range(1,10);
-            cpuTile = GameObject.Find(r.ToString());
-            }while(!cpuTile.GetComponent<TileManager>().spaceAvailable); 
-            //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//   
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
             int bestMoveIndex = minimax.CalculateBestMove(boardStates,CellState.O);
             boardStates[bestMoveIndex] = CellState.O;
             cpuTile = GameObject.Find((bestMoveIndex+1).ToString());
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
-            
         }
 
         yield return new WaitForSeconds(0.5f); //Waits before placing on selected tile
         if(gameOver) //Checks to make sure the game is still active before placing the tile.
             yield break;
 
-        cpuTile.GetComponent<TileManager>().PlaceCpuTile(); 
         isCoroutineExecuting = false; 
+        cpuTile.GetComponent<TileManager>().PlaceCpuTile(); 
+
     }
     
-    public bool CheckForWin(CellState space) //Method that tests every possible scenario for a win. Cols, Rows and Angle. Returns a boolean.
+    
+public CellState GetWinner()
+{
+    // Check rows
+    for (int row = 0; row < 3; row++)
     {
-    if (board[0, 0].GetComponent<TileManager>().space == space && board[0, 1].GetComponent<TileManager>().space == space && board[0, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
-    if (board[1, 0].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[1, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
-    if (board[2, 0].GetComponent<TileManager>().space == space && board[2, 1].GetComponent<TileManager>().space == space && board[2, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
-    // check columns
-    if (board[0, 0].GetComponent<TileManager>().space == space && board[1, 0].GetComponent<TileManager>().space == space && board[2, 0].GetComponent<TileManager>().space == space) { print("cols"); return true; }
-    if (board[0, 1].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[2, 1].GetComponent<TileManager>().space == space) { print("cols"); return true; }
-    if (board[0, 2].GetComponent<TileManager>().space == space && board[1, 2].GetComponent<TileManager>().space == space && board[2, 2].GetComponent<TileManager>().space == space) { print("cols"); return true; }
-    // check diags
-    if (board[0, 0].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[2, 2].GetComponent<TileManager>().space == space) { print("angle"); return true; }
-    if (board[0, 2].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[2, 0].GetComponent<TileManager>().space == space) {print("angle"); return true; }
-
-    return false;
+        if (board[row, 0].GetComponent<TileManager>().space != CellState.Empty &&  
+            board[row, 0].GetComponent<TileManager>().space == board[row, 1].GetComponent<TileManager>().space &&
+            board[row, 0].GetComponent<TileManager>().space == board[row, 2].GetComponent<TileManager>().space)
+        {
+            return board[row, 0].GetComponent<TileManager>().space;
+        }
     }
+
+    // Check columns
+    for (int col = 0; col < 3; col++)
+    {
+        if (board[0, col].GetComponent<TileManager>().space != CellState.Empty &&
+            board[0, col].GetComponent<TileManager>().space == board[1, col].GetComponent<TileManager>().space &&
+            board[0, col].GetComponent<TileManager>().space == board[2, col].GetComponent<TileManager>().space)
+        {
+            return board[0, col].GetComponent<TileManager>().space;
+        }
+    }
+
+    // Check diagonals
+    if (board[0, 0].GetComponent<TileManager>().space != CellState.Empty &&
+        board[0, 0].GetComponent<TileManager>().space == board[1, 1].GetComponent<TileManager>().space &&
+        board[0, 0].GetComponent<TileManager>().space == board[2, 2].GetComponent<TileManager>().space)
+    {
+        return board[0, 0].GetComponent<TileManager>().space;
+    }
+
+    if (board[0, 2].GetComponent<TileManager>().space != CellState.Empty &&
+        board[0, 2].GetComponent<TileManager>().space == board[1, 1].GetComponent<TileManager>().space &&
+        board[0, 2].GetComponent<TileManager>().space == board[2, 0].GetComponent<TileManager>().space)
+    {
+        return board[0, 2].GetComponent<TileManager>().space;
+    }
+
+    // No winner
+    return CellState.Empty;
+}
 
     public bool CheckForDraw() //Method that returns true if none of the tiles are available
     {
