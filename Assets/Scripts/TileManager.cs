@@ -2,13 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+    public enum CellState
+    {
+        Empty,
+        X,
+        O
+    }
 public class TileManager : MonoBehaviour
 {
     public GameObject cross;
     public GameObject circle;
     public bool spaceAvailable;
-    public string space = "empty";
+    public CellState space = CellState.Empty;
     // Start is called before the first frame update
+
+
     void Start()
     {
         spaceAvailable = true;
@@ -19,7 +27,7 @@ public class TileManager : MonoBehaviour
         if(spaceAvailable && CheckPlayerTurn())
         {
             Instantiate(cross, transform.position, Quaternion.identity);
-            space = "cross";
+            space = CellState.X;
             spaceAvailable = false;
             GameController.Instance.ChangeTurn();
         }
@@ -33,7 +41,7 @@ public class TileManager : MonoBehaviour
     public void PlaceCpuTile()
     {
         Instantiate(circle, transform.position, Quaternion.identity);
-        space = "circle";
+        space = CellState.O;
         spaceAvailable = false;
         GameController.Instance.ChangeTurn();
     }

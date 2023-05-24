@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 87069791}
   - component: {fileID: 87069790}
+  - component: {fileID: 87069792}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -152,7 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1baa8c8c1ab65254b9b9ca91bd833b6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOver: 0
   turnIndication: {fileID: 314631247}
   tiles:
   - {fileID: 1544125918}
@@ -179,6 +179,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &87069792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87069789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13b6c734e957ea40afc0ef3f9f00a27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &294244700
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -721,6 +733,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4136198957797789509, guid: c2d815d707910ef45800b587ca8218f7, type: 3}
   m_PrefabInstance: {fileID: 828153160}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &828153165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828153161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b13b6c734e957ea40afc0ef3f9f00a27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1000959608
 PrefabInstance:
   m_ObjectHideFlags: 0

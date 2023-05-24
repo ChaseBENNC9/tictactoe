@@ -7,8 +7,14 @@ public class GameController : MonoBehaviour
 {
     public static GameController Instance;
    
-    public GameObject[,] board ;
-    public bool gameOver;
+    public GameObject[,] board;
+    private CellState[] boardStates;
+    private Minimax minimax;
+    private bool gameOver;
+    public bool GameOver
+    {
+        get{return gameOver;}
+    }
 
 
     GameObject cpuTile;
@@ -37,6 +43,8 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        minimax = Minimax.instance;
+        boardStates = new CellState[9];
         playerTurn = true;
         cpuTurn = false;
         gameOver = false;
@@ -50,13 +58,20 @@ public class GameController : MonoBehaviour
             {
                 k++;
                 board[i,j] = tiles[k-1];
+                boardStates[k-1] = CellState.Empty;
             }
         } 
+
+   
     }
 
     // Update is called once per frame
     void Update()
     {
+        for(int i = 0; i< boardStates.Length; i++)
+        {
+            boardStates[i] = tiles[i].GetComponent<TileManager>().space;
+        }
         if(!gameOver)
         {
             if(playerTurn)
@@ -72,20 +87,20 @@ public class GameController : MonoBehaviour
                 StartCoroutine(DoCpuTurn());
             }
   
-            if( CheckForWin("circle"))
+            if( CheckForWin(CellState.O))
             {
                 turnIndication.text = "Cpu win";
-                GameOver();
+                EndGame();
             }
-            else if (CheckForWin("cross"))
+            else if (CheckForWin(CellState.X))
             {
                 turnIndication.text = "You win!";
-                GameOver();
+                EndGame();
             }
             else if( CheckForDraw())
             {
                 turnIndication.text = "Draw!";
-                GameOver();
+                EndGame();
             }
         }    
     }
@@ -107,9 +122,9 @@ public class GameController : MonoBehaviour
             }while(!cpuTile.GetComponent<TileManager>().spaceAvailable); 
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//   
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
-
-
-
+            int bestMoveIndex = minimax.CalculateBestMove(boardStates,CellState.O);
+            boardStates[bestMoveIndex] = CellState.O;
+            cpuTile = GameObject.Find((bestMoveIndex+1).ToString());
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
             
         }
@@ -122,7 +137,7 @@ public class GameController : MonoBehaviour
         isCoroutineExecuting = false; 
     }
     
-    public bool CheckForWin(string space) //Method that tests every possible scenario for a win. Cols, Rows and Angle. Returns a boolean.
+    public bool CheckForWin(CellState space) //Method that tests every possible scenario for a win. Cols, Rows and Angle. Returns a boolean.
     {
     if (board[0, 0].GetComponent<TileManager>().space == space && board[0, 1].GetComponent<TileManager>().space == space && board[0, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
     if (board[1, 0].GetComponent<TileManager>().space == space && board[1, 1].GetComponent<TileManager>().space == space && board[1, 2].GetComponent<TileManager>().space == space) { print("rows"); return true; }
@@ -159,7 +174,7 @@ public class GameController : MonoBehaviour
         cpuTurn = !cpuTurn;
     }
 
-    public void GameOver() //When the game is over every tile is marked as taken to prevent the game from going further
+    public void EndGame() //When the game is over every tile is marked as taken to prevent the game from going further
     {
         foreach(GameObject tile in tiles)
         {
