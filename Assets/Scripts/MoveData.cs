@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//Gives a score and index for each move the minimax algorithm can make.
 public class MoveData
 {
-    // Start is called before the first frame update
     public int score;
     public int index;
 }
