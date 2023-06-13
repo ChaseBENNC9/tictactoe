@@ -16,7 +16,18 @@ public class Minimax : MonoBehaviour
         instance = this;
     }
 
-
+    public List<T> Shuffle<T>(List<T> list)  
+    {  
+        int n = list.Count;  
+        while (n > 1) {  
+            n--;  
+            int k = Random.Range(0,n+1);  
+            T value = list[k];  
+            list[k] = list[n];  
+            list[n] = value;  
+        }  
+        return list;
+    }
     public int CalculateBestMove(TileState[] currentBoard, TileState player)
     {
         board = currentBoard;
@@ -53,6 +64,7 @@ public class Minimax : MonoBehaviour
     private MoveData MiniMax(int depth, TileState currentPlayer, int alpha, int beta) //Minimax algorithm for tic tac toe;
     {
         List<int> availableMoves = GetAvailableMoves();
+        availableMoves = Shuffle(availableMoves);
         if (IsGameOver() || depth == 5 || availableMoves.Count == 0)
         {
             MoveData move = new MoveData();
