@@ -7,7 +7,8 @@ using UnityEngine;
     {
         Empty,
         X,
-        O
+        O,
+        Disabled
     }
 
     //Manages each tile Object, and whether the specific tile can be used and what it's value is.
@@ -26,11 +27,11 @@ public class TileManager : MonoBehaviour
 
     void OnMouseDown() //When the mouse is clicked and the tile is available and it is the player's turn. The sprite for the player is created.
     {
-        if(space == TileState.Empty && CheckPlayerTurn()) 
+        if(space == TileState.Empty && CheckPlayerTurn())
         {
-            Instantiate(cross, transform.position, Quaternion.identity); //Creates the sprite at the tile
-            space = TileState.X; //Sets the value of the tile
-            GameController.Instance.ChangeTurn(); //Changes to the AI turn
+            Instantiate(cross, transform.position, Quaternion.identity);
+            space = TileState.X;
+            GameController.Instance.ChangeTurn();
         }
     }
 
@@ -41,9 +42,10 @@ public class TileManager : MonoBehaviour
     
     public void PlaceAiTile() //Creates the sprite for the AI at the selected position
     {
-        Instantiate(circle, transform.position, Quaternion.identity); //Creates the sprite at the tile
-        space = TileState.O; //Sets the value of the tile
-        GameController.Instance.ChangeTurn(); //Changes the turn to the player
+        Instantiate(circle, transform.position, Quaternion.identity);
+        space = TileState.O;
+        //spaceAvailable = false;
+        GameController.Instance.ChangeTurn();
     }
 
 }
