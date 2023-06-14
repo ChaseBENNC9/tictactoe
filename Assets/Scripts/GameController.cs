@@ -7,20 +7,20 @@ using UnityEngine.UI;
 //Controls the main Game Loop. Manages when the game is over. Each turn and legal tiles. 
 public class GameController : MonoBehaviour
 {
-    public static GameController Instance;
-
-    public GameObject[,] board;
-    private TileState[] boardStates;
-    private Minimax minimax;
-    private bool gameOver;
+    public static GameController Instance; //Accesible instance of the Gamecontroller script
+    [HideInInspector]
+    public GameObject[,] board; //2 dimensional array for the board. 
+    private TileState[] boardStates; //Array which holds the value of each tile in the board.
+    private Minimax minimax; //Instance of the minimax script
+    private bool gameOver; //bollean which holds whether the game is over or not.
     public bool GameOver
     {
         get { return gameOver; }
     }
 
 
-    GameObject aiTile;
-    private bool playerTurn;
+    GameObject aiTile; 
+    private bool playerTurn; 
     public bool PlayerTurn
     {
         get { return playerTurn; }
@@ -30,25 +30,25 @@ public class GameController : MonoBehaviour
 
     public Text turnIndication;
 
-    public GameObject[] tiles;
+    public GameObject[] tiles; //Array which holds the tile objects, which will be sorted into the board
 
-    private bool isCoroutineExecuting = false;
+    private bool isCoroutineExecuting = false; //Prevents the coroutine from executing multiple times.
     void Awake()
     {
-        Instance = this;
+        Instance = this; //Sets the value of the instance variable to itself.
     }
     // Start is called before the first frame update
     void Start()
     {
         minimax = Minimax.instance;
-        boardStates = new TileState[9];
+        boardStates = new TileState[9]; //Initializing value of the array
         playerTurn = true;
         aiTurn = false;
         gameOver = false;
         board = new GameObject[3, 3];
 
         int k = 0;
-
+        //Loop that sets all the tiles to empty and populates the 2d array for the board.
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -70,7 +70,7 @@ public class GameController : MonoBehaviour
             boardStates[i] = tiles[i].GetComponent<TileManager>().space;
 
         }
-        if (!gameOver)
+        if (!gameOver) //When the game is still active, the game will continue updating text to show who's turn it is and completing the ai turn when necessary.
         {
             if (playerTurn)
             {
@@ -106,12 +106,12 @@ public class GameController : MonoBehaviour
 
     private IEnumerator DoAiTurn() //Ai Turn is done in a Coroutine so Placement doesn't happen immediately.
     {
-        if (isCoroutineExecuting)
+        if (isCoroutineExecuting) //if the coroutine is still executing immediately break out.
         {
             yield break;
         }
         isCoroutineExecuting = true;
-        if (!gameOver)
+        if (!gameOver) //As long as the game is still running choose a tile for the AI
         {
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
             int bestMoveIndex = minimax.CalculateBestMove(boardStates, TileState.O);
@@ -122,10 +122,10 @@ public class GameController : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f); //Waits before placing on selected tile
         if (gameOver) //Checks to make sure the game is still active before placing the tile.
-            yield break;
+            yield break; //If the game is over before the coroutine is finished it will immediately break out.
 
-        isCoroutineExecuting = false;
-        aiTile.GetComponent<TileManager>().PlaceAiTile();
+        isCoroutineExecuting = false; //Sets back to false so it can execute again.
+        aiTile.GetComponent<TileManager>().PlaceAiTile(); //Placement of the tile.
 
     }
 
