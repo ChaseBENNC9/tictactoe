@@ -12,11 +12,9 @@ public class GameController : MonoBehaviour
     public GameObject[,] board; //2 dimensional array for the board. 
     private TileState[] boardStates; //Array which holds the value of each tile in the board.
     private Minimax minimax; //Instance of the minimax script
+
+    [SerializeField]
     private bool gameOver; //bollean which holds whether the game is over or not.
-    public bool GameOver
-    {
-        get { return gameOver; }
-    }
 
 
     GameObject aiTile; 
@@ -33,6 +31,7 @@ public class GameController : MonoBehaviour
     public GameObject[] tiles; //Array which holds the tile objects, which will be sorted into the board
 
     private bool isCoroutineExecuting = false; //Prevents the coroutine from executing multiple times.
+    private bool placingTile = false; // Prevents game from ending when tile is being placed in coroutine
     void Awake()
     {
         Instance = this; //Sets the value of the instance variable to itself.
@@ -65,6 +64,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         for (int i = 0; i < boardStates.Length; i++) //Updates the board with the updated placements.
         {
             boardStates[i] = tiles[i].GetComponent<TileManager>().space;
@@ -85,15 +85,16 @@ public class GameController : MonoBehaviour
                 StartCoroutine(DoAiTurn());
             }
 
-            if (GetWinner() == TileState.X)
+            if (minimax.FindWinner(boardStates) == TileState.X)
             {
                 turnIndication.text = "You win!";
                 EndGame();
             }
-            else if (GetWinner() == TileState.O)
+            else if (minimax.FindWinner(boardStates) == TileState.O)
             {
                 turnIndication.text = "AI Win";
-                EndGame();
+                if(!placingTile)
+                    EndGame();
             }
             else if (CheckForDraw())
             {
@@ -119,67 +120,24 @@ public class GameController : MonoBehaviour
             aiTile = GameObject.Find((bestMoveIndex + 1).ToString());
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
         }
-
+        placingTile = true; 
         yield return new WaitForSeconds(0.5f); //Waits before placing on selected tile
-        if (gameOver) //Checks to make sure the game is still active before placing the tile.
-            yield break; //If the game is over before the coroutine is finished it will immediately break out.
+        if (aiTile.GetComponent<TileManager>().space == TileState.Disabled) //Checks to make sure the Tile is still available before placing the tile.
+            yield break; //if the space is diabled before the coroutine is finished it will immediately break out.
 
         isCoroutineExecuting = false; //Sets back to false so it can execute again.
         aiTile.GetComponent<TileManager>().PlaceAiTile(); //Placement of the tile.
-
+        placingTile = false;
     }
 
-
-    private TileState GetWinner()
-    {
-        // Check rows
-        for (int row = 0; row < 3; row++)
-        {
-            if (board[row, 0].GetComponent<TileManager>().space != TileState.Empty &&
-                board[row, 0].GetComponent<TileManager>().space == board[row, 1].GetComponent<TileManager>().space &&
-                board[row, 0].GetComponent<TileManager>().space == board[row, 2].GetComponent<TileManager>().space)
-            {
-                return board[row, 0].GetComponent<TileManager>().space;
-            }
-        }
-
-        // Check columns
-        for (int col = 0; col < 3; col++)
-        {
-            if (board[0, col].GetComponent<TileManager>().space != TileState.Empty &&
-                board[0, col].GetComponent<TileManager>().space == board[1, col].GetComponent<TileManager>().space &&
-                board[0, col].GetComponent<TileManager>().space == board[2, col].GetComponent<TileManager>().space)
-            {
-                return board[0, col].GetComponent<TileManager>().space;
-            }
-        }
-
-        // Check diagonals
-        if (board[0, 0].GetComponent<TileManager>().space != TileState.Empty &&
-            board[0, 0].GetComponent<TileManager>().space == board[1, 1].GetComponent<TileManager>().space &&
-            board[0, 0].GetComponent<TileManager>().space == board[2, 2].GetComponent<TileManager>().space)
-        {
-            return board[0, 0].GetComponent<TileManager>().space;
-        }
-
-        if (board[0, 2].GetComponent<TileManager>().space != TileState.Empty &&
-            board[0, 2].GetComponent<TileManager>().space == board[1, 1].GetComponent<TileManager>().space &&
-            board[0, 2].GetComponent<TileManager>().space == board[2, 0].GetComponent<TileManager>().space)
-        {
-            return board[0, 2].GetComponent<TileManager>().space;
-        }
-
-        // No winner
-        return TileState.Empty;
-    }
 
     public bool CheckForDraw() //Method that returns true if none of the tiles are available
     {
         bool noSpaces = false;
         foreach (GameObject tile in tiles)
         {
-            noSpaces = !tile.GetComponent<TileManager>().spaceAvailable; //noSpaces is set to the oppisite of each tiles availability (if every tile is taken returns true)
-            if (!noSpaces) //as soon as an available tile is found it breaks out the loop and returns false
+            noSpaces = tile.GetComponent<TileManager>().space != TileState.Empty; //noSpaces checks each tile to see if its empty or not (if every tile is taken returns true)
+            if (!noSpaces) //as soon as an Empty tile is found it breaks out the loop and returns false
             {
                 break;
             }
@@ -198,7 +156,8 @@ public class GameController : MonoBehaviour
     {
         foreach (GameObject tile in tiles)
         {
-            tile.GetComponent<TileManager>().spaceAvailable = false;
+            if(tile.GetComponent<TileManager>().space == TileState.Empty)
+                tile.GetComponent<TileManager>().space = TileState.Disabled;
         }
         gameOver = true;
     }
