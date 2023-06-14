@@ -125,9 +125,9 @@ public class Minimax : MonoBehaviour
 
     private bool IsGameOver()
     {
-        return (FindWinner() != TileState.Empty) || (GetAvailableMoves().Count == 0);
+        return (FindWinner(board) != TileState.Empty) || (GetAvailableMoves().Count == 0);
     }
-    private TileState FindWinner() //Win method, Used to evaluate when the algorithm should stop.
+    public TileState FindWinner( TileState[] board) //Win method, Used to evaluate when the algorithm should stop.
     {
 
         // Check rows
@@ -163,7 +163,7 @@ public class Minimax : MonoBehaviour
     }
     private int EvaluateBoard() //Return a value, if the game is over check if there is a winner otherwise it could be a draw or the match isnt over.
     {
-        TileState winner = FindWinner();
+        TileState winner = FindWinner(board);
         if (winner == TileState.O)
         {
             return 1;
