@@ -8,15 +8,13 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     public static GameController Instance; //Accesible instance of the Gamecontroller script
-    [HideInInspector]
-    public GameObject[,] board; //2 dimensional array for the board. 
-    private TileState[] boardStates; //Array which holds the value of each tile in the board.
+    private TileState[] boardStates; //Array which holds the State of each tile in the board.
     private Minimax minimax; //Instance of the minimax script
 
-    [SerializeField]
     private bool gameOver; //bollean which holds whether the game is over or not.
 
-
+    private const int BOARDSIZE = 9; //Constant value for size of grid
+    private const float DELAY = 0.5f; //Time to wait before placing tile
     GameObject aiTile; 
     private bool playerTurn; 
     public bool PlayerTurn
@@ -31,7 +29,6 @@ public class GameController : MonoBehaviour
     public GameObject[] tiles; //Array which holds the tile objects, which will be sorted into the board
 
     private bool isCoroutineExecuting = false; //Prevents the coroutine from executing multiple times.
-    private bool placingTile = false; // Prevents game from ending when tile is being placed in coroutine
     void Awake()
     {
         Instance = this; //Sets the value of the instance variable to itself.
@@ -40,22 +37,15 @@ public class GameController : MonoBehaviour
     void Start()
     {
         minimax = Minimax.instance;
-        boardStates = new TileState[9]; //Initializing value of the array
+        boardStates = new TileState[BOARDSIZE]; //Initializing value of the array
         playerTurn = true;
         aiTurn = false;
         gameOver = false;
-        board = new GameObject[3, 3];
 
-        int k = 0;
         //Loop that sets all the tiles to empty and populates the 2d array for the board.
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < BOARDSIZE; i++)
         {
-            for (int j = 0; j < 3; j++)
-            {
-                k++;
-                board[i, j] = tiles[k - 1];
-                boardStates[k - 1] = TileState.Empty;
-            }
+            boardStates[i] = TileState.Empty;
         }
 
 
@@ -93,7 +83,7 @@ public class GameController : MonoBehaviour
             else if (minimax.FindWinner(boardStates) == TileState.O)
             {
                 turnIndication.text = "AI Win";
-                if(!placingTile)
+                if(!isCoroutineExecuting) //When the coroutine is not executing, (not placing the AI tile) It will end the game
                     EndGame();
             }
             else if (CheckForDraw())
@@ -117,17 +107,16 @@ public class GameController : MonoBehaviour
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
             int bestMoveIndex = minimax.CalculateBestMove(boardStates, TileState.O);
             boardStates[bestMoveIndex] = TileState.O;
-            aiTile = GameObject.Find((bestMoveIndex + 1).ToString());
+            aiTile = GameObject.Find((bestMoveIndex + 1).ToString()); //Adds 1 to the index to find the named tile GameObject between 1-9
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
         }
-        placingTile = true; 
         yield return new WaitForSeconds(0.5f); //Waits before placing on selected tile
         if (aiTile.GetComponent<TileManager>().space == TileState.Disabled) //Checks to make sure the Tile is still available before placing the tile.
             yield break; //if the space is diabled before the coroutine is finished it will immediately break out.
 
-        isCoroutineExecuting = false; //Sets back to false so it can execute again.
         aiTile.GetComponent<TileManager>().PlaceAiTile(); //Placement of the tile.
-        placingTile = false;
+        isCoroutineExecuting = false; //Sets back to false so it can execute again.
+
     }
 
 
