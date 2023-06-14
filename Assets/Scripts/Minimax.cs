@@ -8,15 +8,15 @@ public class Minimax : MonoBehaviour
 {
     private TileState[] board; //Get the State of each Tile on the board
     private TileState aiPlayer; //Gives the AI and player the corresponding piece "X" or "O".
-    private TileState humanPlayer; 
-    public static Minimax instance;
+    private TileState humanPlayer;
+    public static Minimax instance; //Create an accessible instance of the Minimax script
 
     void Awake()
     {
         instance = this;
     }
 
-    public List<T> Shuffle<T>(List<T> list)  
+    public List<T> Shuffle<T>(List<T> list)  //Shuffles the Inputed List so each playthrough is different.
     {  
         int n = list.Count;  
         while (n > 1) {  
@@ -28,9 +28,9 @@ public class Minimax : MonoBehaviour
         }  
         return list;
     }
-    public int CalculateBestMove(TileState[] currentBoard, TileState player)
+    public int CalculateBestMove(TileState[] currentBoard, TileState player) //Method that returns the index of the best tile for the AI.
     {
-        board = currentBoard;
+        board = currentBoard; 
         aiPlayer = player;
         humanPlayer = (player == TileState.X) ? TileState.O : TileState.X;
         MoveData bestMove = MiniMax(0, aiPlayer, int.MinValue, int.MaxValue);
@@ -61,10 +61,10 @@ public class Minimax : MonoBehaviour
         return moves[bestMoveIndex];
     }
 
-    private MoveData MiniMax(int depth, TileState currentPlayer, int alpha, int beta) //Minimax algorithm for tic tac toe;
+    private MoveData MiniMax(int depth, TileState currentPlayer, int alpha, int beta) //Recursive Minimax algorithm for tic tac toe;
     {
-        List<int> availableMoves = GetAvailableMoves();
-        availableMoves = Shuffle(availableMoves);
+        List<int> availableMoves = GetAvailableMoves(); //Fills the list with the valid moves the AI is allowed to make.
+        availableMoves = Shuffle(availableMoves); //Shuffles the Moves list so the game is not repetitive 
         if (IsGameOver() || depth == 5 || availableMoves.Count == 0)
         {
             MoveData move = new MoveData();
@@ -88,7 +88,7 @@ public class Minimax : MonoBehaviour
                 move.score = result.score;
 
 
-                if (move.score > alpha)
+                if (move.score > alpha) 
                 {
                     alpha = move.score;
                 }
@@ -106,10 +106,10 @@ public class Minimax : MonoBehaviour
             }
 
             // Restore the board state by removing the move
-            board[moveIndex] = TileState.Empty;
+            board[moveIndex] = TileState.Empty; 
 
             moves.Add(move);
-            if (currentPlayer == aiPlayer && move.score >= beta)
+            if (currentPlayer == aiPlayer && move.score >= beta) //Alpha beta pruning for improving the algorithm performance, Prunes any branches that return lower or higher values than needed.
             {
                 break;
             }
@@ -120,7 +120,7 @@ public class Minimax : MonoBehaviour
 
         }
 
-        return GetBestMove(moves, currentPlayer);
+        return GetBestMove(moves, currentPlayer); //Returns the best move from a list of moves and which player is currently active.
     }
 
     private bool IsGameOver()
@@ -166,7 +166,6 @@ public class Minimax : MonoBehaviour
         TileState winner = FindWinner();
         if (winner == TileState.O)
         {
-
             return 1;
         }
         else if (winner == TileState.X)
