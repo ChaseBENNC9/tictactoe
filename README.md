@@ -3,7 +3,7 @@ Advanced task for [Game #4 AI Strategy](https://github.com/ChaseBENNC9/ChessAISt
 Refactored the Minimax script from the AI Strategy to work in a game of tic tac toe.
 
 ## Known Issues
-- Shuffle Method randomizing all moves instead of first, removed for now needs better implementation.
+- Shuffle Method can sometimes cause the AI to not block the player.
 - Sometimes it's still possible for the Player to win, with the correct implementation of minimax this should not happen\
 
 ## Note
