@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
 
     public GameObject[] tiles; //Array which holds the tile objects, which will be sorted into the board
 
-    private bool isCoroutineExecuting = false; //Prevents the coroutine from executing multiple times.
+    private bool isAITurnInProgress = false; //Prevents the coroutine from executing multiple times.
     void Awake()
     {
         Instance = this; //Sets the value of the instance variable to itself.
@@ -83,7 +83,7 @@ public class GameController : MonoBehaviour
             else if (minimax.FindWinner(boardStates) == TileState.O)
             {
                 turnIndication.text = "AI Win";
-                if(!isCoroutineExecuting) //When the coroutine is not executing, (not placing the AI tile) It will end the game
+                if(!isAITurnInProgress) //When it is not the AI turn, (The coroutine is not executing) It will end the game
                     EndGame();
             }
             else if (CheckForDraw())
@@ -97,11 +97,11 @@ public class GameController : MonoBehaviour
 
     private IEnumerator DoAiTurn() //Ai Turn is done in a Coroutine so Placement doesn't happen immediately.
     {
-        if (isCoroutineExecuting) //if the coroutine is still executing immediately break out.
+        if (isAITurnInProgress) //if the AI turn is in progress immediately break out.
         {
             yield break;
         }
-        isCoroutineExecuting = true;
+        isAITurnInProgress = true; //Sets to true to prevent multiple coroutines from executing
         if (!gameOver) //As long as the game is still running choose a tile for the AI
         {
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//Actual Minimax algorithm placement
@@ -110,12 +110,12 @@ public class GameController : MonoBehaviour
             aiTile = GameObject.Find((bestMoveIndex + 1).ToString()); //Adds 1 to the index to find the named tile GameObject between 1-9
             //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>//
         }
-        yield return new WaitForSeconds(0.5f); //Waits before placing on selected tile
+        yield return new WaitForSeconds(DELAY); //Waits before placing on selected tile
         if (aiTile.GetComponent<TileManager>().space == TileState.Disabled) //Checks to make sure the Tile is still available before placing the tile.
             yield break; //if the space is diabled before the coroutine is finished it will immediately break out.
 
         aiTile.GetComponent<TileManager>().PlaceAiTile(); //Placement of the tile.
-        isCoroutineExecuting = false; //Sets back to false so it can execute again.
+        isAITurnInProgress = false; //Sets back to false so it can execute again.
 
     }
 
