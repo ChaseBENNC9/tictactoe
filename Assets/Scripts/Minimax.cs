@@ -10,6 +10,9 @@ public class Minimax : MonoBehaviour
     private TileState aiPlayer; //Gives the AI and player the corresponding piece "X" or "O".
     private TileState humanPlayer;
     public static Minimax instance; //Create an accessible instance of the Minimax script
+    public const int MAXDEPTH = 5; //Max depth for the recursive minimax algorithm
+
+    public const int GRIDSIZE = 3; //the width and height of the grid.
 
     void Awake()
     {
@@ -17,20 +20,21 @@ public class Minimax : MonoBehaviour
     }
 
     public List<T> Shuffle<T>(List<T> list)  //Shuffles the Inputed List so each playthrough is different.
-    {  
-        int n = list.Count;  
-        while (n > 1) {  
-            n--;  
-            int k = Random.Range(0,n+1);  
-            T value = list[k];  
-            list[k] = list[n];  
-            list[n] = value;  
-        }  
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = Random.Range(0, n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
         return list;
     }
     public int CalculateBestMove(TileState[] currentBoard, TileState player) //Method that returns the index of the best tile for the AI.
     {
-        board = currentBoard; 
+        board = currentBoard;
         aiPlayer = player;
         humanPlayer = (player == TileState.X) ? TileState.O : TileState.X;
         MoveData bestMove = MiniMax(0, aiPlayer, int.MinValue, int.MaxValue);
@@ -49,7 +53,7 @@ public class Minimax : MonoBehaviour
     private MoveData GetBestMove(List<MoveData> moves, TileState currentPlayer) //Depending on whether the player is the Ai or the human, the best score will be the highest or lowest score.
     {
         int bestMoveIndex = 0;
-        int bestScore = (currentPlayer == aiPlayer) ? int.MinValue : int.MaxValue;
+        int bestScore = (currentPlayer == aiPlayer) ? int.MinValue : int.MaxValue; //Determines whether to target thr lowest or highest score depending on if its the ai or player turn
         for (int i = 0; i < moves.Count; i++)
         {
             if ((currentPlayer == aiPlayer && moves[i].score > bestScore) || (currentPlayer == humanPlayer && moves[i].score < bestScore))
@@ -65,7 +69,7 @@ public class Minimax : MonoBehaviour
     {
         List<int> availableMoves = GetAvailableMoves(); //Fills the list with the valid moves the AI is allowed to make.
         availableMoves = Shuffle(availableMoves); //Shuffles the Moves list so the game is not repetitive 
-        if (IsGameOver() || depth == 5 || availableMoves.Count == 0)
+        if (IsGameOver() || depth == MAXDEPTH || availableMoves.Count == 0)
         {
             MoveData move = new MoveData();
             move.score = EvaluateBoard();
@@ -88,7 +92,7 @@ public class Minimax : MonoBehaviour
                 move.score = result.score;
 
 
-                if (move.score > alpha) 
+                if (move.score > alpha)
                 {
                     alpha = move.score;
                 }
@@ -106,7 +110,7 @@ public class Minimax : MonoBehaviour
             }
 
             // Restore the board state by removing the move
-            board[moveIndex] = TileState.Empty; 
+            board[moveIndex] = TileState.Empty;
 
             moves.Add(move);
             if (currentPlayer == aiPlayer && move.score >= beta) //Alpha beta pruning for improving the algorithm performance, Prunes any branches that return lower or higher values than needed.
@@ -127,25 +131,25 @@ public class Minimax : MonoBehaviour
     {
         return (FindWinner(board) != TileState.Empty) || (GetAvailableMoves().Count == 0);
     }
-    public TileState FindWinner( TileState[] board) //Win method, Used to evaluate when the algorithm should stop.
+    public TileState FindWinner(TileState[] board) //Win method, Used to evaluate when the algorithm should stop.
     {
 
         // Check rows
-        for (int row = 0; row < 3; row++)
+        for (int row = 0; row < GRIDSIZE; row++)
         {
 
-            if (board[row * 3] != TileState.Empty && board[row * 3] == board[row * 3 + 1] && board[row * 3] == board[row * 3 + 2])
+            if (board[row * GRIDSIZE] != TileState.Empty && board[row * GRIDSIZE] == board[row * GRIDSIZE + 1] && board[row * GRIDSIZE] == board[row * GRIDSIZE + 2])
             {
-                return board[row * 3];
+                return board[row * GRIDSIZE]; //returns the state of the selected row to determine who won the game
             }
         }
 
         // Check columns
-        for (int col = 0; col < 3; col++)
+        for (int col = 0; col < GRIDSIZE; col++)
         {
-            if (board[col] != TileState.Empty && board[col] == board[col + 3] && board[col] == board[col + 6])
+            if (board[col] != TileState.Empty && board[col] == board[col + GRIDSIZE] && board[col] == board[col + (GRIDSIZE * 2)]) //Check each Individual column for a win
             {
-                return board[col];
+                return board[col]; //Returns the state of the selected column , to determine who won the game
             }
         }
 
