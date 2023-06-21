@@ -1,6 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +14,8 @@ public class GameController : MonoBehaviour
 
     private const int BOARDSIZE = 9; //Constant value for size of grid
     private const float DELAY = 0.5f; //Time to wait before placing tile
-    GameObject aiTile; 
-    private bool playerTurn; 
+    GameObject aiTile;
+    private bool playerTurn;
     public bool PlayerTurn
     {
         get { return playerTurn; }
@@ -54,7 +53,7 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
         for (int i = 0; i < boardStates.Length; i++) //Updates the board with the updated placements.
         {
             boardStates[i] = tiles[i].GetComponent<TileManager>().space;
@@ -83,7 +82,7 @@ public class GameController : MonoBehaviour
             else if (minimax.FindWinner(boardStates) == TileState.O)
             {
                 turnIndication.text = "AI Win";
-                if(!isAITurnInProgress) //When it is not the AI turn, (The coroutine is not executing) It will end the game
+                if (!isAITurnInProgress) //When it is not the AI turn, (The coroutine is not executing) It will end the game
                     EndGame();
             }
             else if (CheckForDraw())
@@ -145,7 +144,7 @@ public class GameController : MonoBehaviour
     {
         foreach (GameObject tile in tiles)
         {
-            if(tile.GetComponent<TileManager>().space == TileState.Empty)
+            if (tile.GetComponent<TileManager>().space == TileState.Empty)
                 tile.GetComponent<TileManager>().space = TileState.Disabled;
         }
         gameOver = true;

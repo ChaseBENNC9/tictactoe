@@ -1,7 +1,7 @@
 //Minimax script , implemented from the Chess Game and some suggestions from Chat GPT. This script manages the AI Minimax algorithm and determines the best possible moves for it to take.
 
-using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Minimax : MonoBehaviour
@@ -11,7 +11,6 @@ public class Minimax : MonoBehaviour
     private TileState humanPlayer;
     public static Minimax instance; //Create an accessible instance of the Minimax script
     public const int MAXDEPTH = 5; //Max depth for the recursive minimax algorithm
-
     public const int GRIDSIZE = 3; //the width and height of the grid.
 
     void Awake()
