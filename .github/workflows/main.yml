@@ -9,9 +9,9 @@ jobs:
   needs: build
   steps: 
     - uses: actions/download-artifact@v3
-          with:
-            name: Build
-            path: build
+        with:
+          name: Build
+          path: build
     - name: ZIP Build
         uses: thedoctor0/zip-release@master
         with: 
