@@ -1,13 +1,12 @@
 name: Actions 😎
 
-#on: [push, pull_request]
 on: 
-  workflow_dispatch: {}
+  [push, pull_request]
 jobs:
   release-project:
     name: Release Project
     runs-on: ubuntu-latest
-    #needs: build
+    needs: build
     steps: 
       - uses: actions/download-artifact@v3
         with:
