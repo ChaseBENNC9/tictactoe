@@ -9,34 +9,32 @@ jobs:
   needs: build
   steps: 
     - uses: actions/download-artifact@v3
-        with:
-          name: Build
-          path: build
+      with:
+        name: Build
+        path: build
     - name: ZIP Build
-        uses: thedoctor0/zip-release@master
-        with: 
-          filename: build.zip
+      uses: thedoctor0/zip-release@master
+      with: 
+        filename: build.zip
     - name: Bump version and push tag
-        id: newTag
-        uses: hennejg/github-tag-action@v4.1.jh1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}      
+      id: newTag
+      uses: hennejg/github-tag-action@v4.1.jh1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}      
     - name: Create Release
-            id: create_release
-            uses: actions/create-release@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-            with:
-              tag_name: ${{steps.newTag.outputs.new_tag}}
-              release_name: Release ${{steps.newTag.outputs.new_tag}}
-              body: |
-                Changes in this Release
-                - First Change
-                - Second Change
-              draft: false
-              prerelease: false
-
-
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{steps.newTag.outputs.new_tag}}
+        release_name: Release ${{steps.newTag.outputs.new_tag}}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false
 
 
   build:
