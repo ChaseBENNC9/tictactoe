@@ -16,6 +16,8 @@ jobs:
         uses: thedoctor0/zip-release@master
         with: 
           filename: build.zip
+      - name: Checkout Code
+        uses: actions/checkout@master
       - name: Bump version and push tag
         id: newTag
         uses: hennejg/github-tag-action@v4.1.jh1
